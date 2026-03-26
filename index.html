@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetPlatino — Apuestas Deportivas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --card: #16161f;
+      --card-hover: #1c1c28;
+      --border: #222233;
+      --text: #e8e8f0;
+      --text-dim: #7a7a95;
+      --gold: #f0c040;
+      --gold-dim: rgba(240, 192, 64, 0.12);
+      --green: #22c55e;
+      --green-dim: rgba(34, 197, 94, 0.12);
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --sans: 'Outfit', sans-serif;
+      --mono: 'Space Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); overflow-x: hidden; }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--gold), #e6a800);
+      border-radius: 8px;
+      display: grid; place-items: center;
+      font-weight: 800; font-size: 16px; color: #0a0a0f;
+    }
+    .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.03em; }
+    .brand h1 span { color: var(--gold); }
+
+    .topbar-nav { display: flex; gap: 4px; }
+    .topbar-nav a {
+      color: var(--text-dim); text-decoration: none; font-size: 13px;
+      font-weight: 500; padding: 8px 14px; border-radius: 8px; transition: all 0.2s;
+    }
+    .topbar-nav a:hover, .topbar-nav a.active { color: var(--text); background: rgba(255,255,255,0.05); }
+    .topbar-nav a.active { color: var(--gold); }
+
+    .topbar-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-login {
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+      font-family: var(--sans); font-size: 13px; font-weight: 600;
+      padding: 8px 18px; border-radius: 8px; cursor: pointer;
+    }
+    .btn-register {
+      background: linear-gradient(135deg, var(--gold), #e6a800); border: none; color: #0a0a0f;
+      font-family: var(--sans); font-size: 13px; font-weight: 700;
+      padding: 8px 18px; border-radius: 8px; cursor: pointer;
+    }
+    .btn-register:hover { filter: brightness(1.1); }
+    .balance-pill {
+      font-family: var(--mono); font-size: 12px; color: var(--green);
+      background: var(--green-dim); padding: 6px 12px; border-radius: 6px;
+      border: 1px solid rgba(34,197,94,0.2);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: linear-gradient(135deg, #1a1330 0%, #0f1a2e 50%, #0a1520 100%);
+      padding: 40px 32px; position: relative; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -50%; right: -10%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(240,192,64,0.08), transparent 70%);
+    }
+    .hero-content { position: relative; max-width: 600px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--gold-dim); color: var(--gold);
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 5px 12px; border-radius: 999px;
+      border: 1px solid rgba(240,192,64,0.2); margin-bottom: 16px;
+    }
+    .hero h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 10px; }
+    .hero h2 em { font-style: normal; color: var(--gold); }
+    .hero p { color: var(--text-dim); font-size: 15px; line-height: 1.5; }
+
+    /* ─── LAYOUT ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 300px;
+      min-height: calc(100vh - 56px);
+    }
+    @media (max-width: 1100px) { .layout { grid-template-columns: 1fr 300px; } .sidebar-left { display: none; } }
+    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .betslip-sidebar { display: none; } }
+
+    /* ─── SIDEBAR LEFT ─── */
+    .sidebar-left { border-right: 1px solid var(--border); padding: 20px 16px; }
+    .sidebar-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 12px; }
+    .sport-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text-dim); transition: all 0.15s;
+    }
+    .sport-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .sport-item.active { background: var(--gold-dim); color: var(--gold); }
+    .sport-item .icon { font-size: 18px; width: 24px; text-align: center; }
+    .sport-item .count { margin-left: auto; font-family: var(--mono); font-size: 11px; background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 4px; }
+
+    /* ─── EVENTS ─── */
+    .events-feed { padding: 20px 24px; }
+    .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .feed-header h3 { font-size: 16px; font-weight: 700; }
+    .live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.06em; }
+    .live-badge .dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .league-group { margin-bottom: 24px; }
+    .league-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-dim);
+      padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 8px;
+    }
+    .event-row {
+      display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center;
+      padding: 12px 14px; border-radius: 10px; background: var(--card);
+      margin-bottom: 6px; transition: background 0.15s; border: 1px solid transparent;
+    }
+    .event-row:hover { background: var(--card-hover); border-color: var(--border); }
+    .event-time { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+    .event-time.live { color: var(--red); font-weight: 700; }
+    .event-teams { font-size: 13px; font-weight: 600; line-height: 1.5; }
+    .event-teams .vs { color: var(--text-dim); font-weight: 400; font-size: 11px; }
+    .event-score { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--gold); margin-left: 8px; }
+
+    .odds-group { display: flex; gap: 6px; }
+    .odd-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px; min-width: 64px; cursor: pointer; transition: all 0.15s;
+    }
+    .odd-btn:hover { background: var(--gold-dim); border-color: rgba(240,192,64,0.3); }
+    .odd-btn.selected { background: var(--gold-dim); border-color: var(--gold); }
+    .odd-btn .label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; }
+    .odd-btn .value { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+    .odd-btn:hover .value { color: var(--gold); }
+
+    /* ─── BETSLIP ─── */
+    .betslip-sidebar { border-left: 1px solid var(--border); padding: 20px 16px; }
+    .betslip-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .betslip-header h4 { font-size: 14px; font-weight: 700; }
+    .betslip-count { background: var(--gold); color: #0a0a0f; font-size: 11px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; }
+
+    .promo-card {
+      background: linear-gradient(135deg, rgba(240,192,64,0.08), rgba(240,192,64,0.02));
+      border: 1px solid rgba(240,192,64,0.15); border-radius: 10px; padding: 16px; margin-top: 20px;
+    }
+    .promo-card h5 { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+    .promo-card p { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+    .promo-card .code { font-family: var(--mono); font-size: 12px; background: rgba(240,192,64,0.12); color: var(--gold); padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 8px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 24px 32px; display: flex; align-items: center;
+      justify-content: space-between; font-size: 12px; color: var(--text-dim);
+    }
+    footer a { color: var(--text-dim); text-decoration: none; }
+    .footer-links { display: flex; gap: 20px; }
+
+    .test-watermark {
+      position: fixed; bottom: 12px; left: 12px; z-index: 9998;
+      font-family: var(--mono); font-size: 10px; color: rgba(240,192,64,0.35);
+      background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 4px; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">B</div>
+      <h1>Bet<span>Platino</span></h1>
+    </div>
+    <nav class="topbar-nav">
+      <a href="#" class="active">⚽ Deportes</a>
+      <a href="#">🎰 Casino</a>
+      <a href="#">🎯 En Vivo</a>
+      <a href="#">🏇 Virtuales</a>
+      <a href="#">🎁 Promos</a>
+    </nav>
+    <div class="topbar-actions">
+      <div class="balance-pill">$ 150.000 COP</div>
+      <button class="btn-login">Ingresar</button>
+      <button class="btn-register">Regístrate</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🎁 Nuevo</div>
+      <h2>Bono de bienvenida <em>100%</em> hasta $200.000</h2>
+      <p>Regístrate hoy y duplica tu primer depósito. Válido para apuestas deportivas y casino.</p>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar-left">
+      <div class="sidebar-title">Deportes</div>
+      <div class="sport-item active"><span class="icon">⚽</span> Fútbol <span class="count">48</span></div>
+      <div class="sport-item"><span class="icon">🏀</span> Baloncesto <span class="count">12</span></div>
+      <div class="sport-item"><span class="icon">🎾</span> Tenis <span class="count">24</span></div>
+      <div class="sport-item"><span class="icon">🏈</span> Fútbol Am. <span class="count">6</span></div>
+      <div class="sport-item"><span class="icon">⚾</span> Béisbol <span class="count">8</span></div>
+      <div class="sport-item"><span class="icon">🥊</span> MMA / Boxeo <span class="count">3</span></div>
+      <div class="sport-item"><span class="icon">🎮</span> Esports <span class="count">15</span></div>
+      <div style="margin-top:24px"></div>
+      <div class="sidebar-title">Rápido</div>
+      <div class="sport-item"><span class="icon">⚡</span> Apuestas rápidas</div>
+      <div class="sport-item"><span class="icon">📊</span> Estadísticas</div>
+      <div class="sport-item"><span class="icon">📋</span> Resultados</div>
+    </aside>
+
+    <main class="events-feed">
+      <div class="feed-header">
+        <h3>⚽ Fútbol — Próximos partidos</h3>
+        <div class="live-badge"><span class="dot"></span> 4 EN VIVO</div>
+      </div>
+
+      <div class="league-group">
+        <div class="league-label">🇨🇴 Liga BetPlay Dimayor — Jornada 18</div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time live">⬤ 67' — EN VIVO</span>
+            <div class="event-teams">Atlético Nacional <span class="event-score">2</span> <span class="vs">—</span> Millonarios FC <span class="event-score">1</span></div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">1.45</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">4.20</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">6.50</span></div>
+          </div>
+        </div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time live">⬤ 34' — EN VIVO</span>
+            <div class="event-teams">América de Cali <span class="event-score">0</span> <span class="vs">—</span> Dep. Cali <span class="event-score">0</span></div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">2.10</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">3.30</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">3.50</span></div>
+          </div>
+        </div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time">Hoy — 19:30</span>
+            <div class="event-teams">Santa Fe <span class="vs">vs</span> Junior FC</div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">2.25</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">3.10</span></div>
+            <div class="odd-btn selected"><span class="label">2</span><span class="value">3.40</span></div>
+          </div>
+        </div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time">Hoy — 21:00</span>
+            <div class="event-teams">Dep. Pereira <span class="vs">vs</span> Once Caldas</div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">1.90</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">3.40</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">4.10</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="league-group">
+        <div class="league-label">🇪🇺 UEFA Champions League — Cuartos de Final</div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time live">⬤ 52' — EN VIVO</span>
+            <div class="event-teams">Real Madrid <span class="event-score">1</span> <span class="vs">—</span> Manchester City <span class="event-score">1</span></div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">2.00</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">3.50</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">3.60</span></div>
+          </div>
+        </div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time live">⬤ 78' — EN VIVO</span>
+            <div class="event-teams">PSG <span class="event-score">3</span> <span class="vs">—</span> Bayern Munich <span class="event-score">2</span></div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">1.30</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">5.00</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">8.50</span></div>
+          </div>
+        </div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time">Mañana — 14:00</span>
+            <div class="event-teams">Barcelona <span class="vs">vs</span> Inter de Milán</div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">1.75</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">3.80</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">4.50</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="league-group">
+        <div class="league-label">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League — Jornada 32</div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time">Sábado — 10:00</span>
+            <div class="event-teams">Arsenal <span class="vs">vs</span> Liverpool</div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">2.40</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">3.20</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">2.90</span></div>
+          </div>
+        </div>
+        <div class="event-row">
+          <div class="event-info">
+            <span class="event-time">Sábado — 12:30</span>
+            <div class="event-teams">Chelsea <span class="vs">vs</span> Aston Villa</div>
+          </div>
+          <div class="odds-group">
+            <div class="odd-btn"><span class="label">1</span><span class="value">1.85</span></div>
+            <div class="odd-btn"><span class="label">X</span><span class="value">3.50</span></div>
+            <div class="odd-btn"><span class="label">2</span><span class="value">4.20</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="betslip-sidebar">
+      <div class="betslip-header">
+        <h4>🎫 Boleta de apuesta</h4>
+        <div class="betslip-count">1</div>
+      </div>
+      <div style="background:var(--card);border-radius:10px;padding:12px;margin-bottom:8px;">
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">Liga BetPlay — Santa Fe vs Junior FC</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Junior FC gana</div>
+        <div style="font-family:var(--mono);font-size:14px;color:var(--gold);font-weight:700;">@ 3.40</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+        <label style="font-size:12px;color:var(--text-dim);">Monto de apuesta</label>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;">
+          <span style="font-size:12px;color:var(--text-dim);">$</span>
+          <span style="font-family:var(--mono);font-size:14px;">20.000</span>
+          <span style="font-size:11px;color:var(--text-dim);margin-left:auto;">COP</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:4px;">
+          <span>Ganancia potencial</span>
+          <span style="color:var(--green);font-family:var(--mono);font-weight:700;">$ 68.000</span>
+        </div>
+      </div>
+      <button style="width:100%;background:linear-gradient(135deg,var(--gold),#e6a800);color:#0a0a0f;border:none;font-family:var(--sans);font-weight:700;font-size:14px;padding:14px;border-radius:10px;cursor:pointer;margin-top:12px;">Apostar $ 20.000</button>
+      <div class="promo-card">
+        <h5>🎁 Bono de primer depósito</h5>
+        <p>Deposita hoy y recibe 100% hasta $200.000 en apuestas gratis.</p>
+        <div class="code">BIENVENIDO100</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <span>© 2026 BetPlatino — Sitio de prueba. No es un operador real.</span>
+    <div class="footer-links">
+      <a href="#">Términos</a>
+      <a href="#">Privacidad</a>
+      <a href="#">Juego responsable</a>
+      <a href="#">Contacto</a>
+    </div>
+  </footer>
+
+  <div class="test-watermark">ENTORNO DE PRUEBAS — WOLKVOX CHAT WIDGET</div>
+
+  <!-- START CHATBOX WOLKVOX-->
+  <script id="prodId" type="text/javascript" src="https://widget03.wolkvox.com/chat/?prodId=bnVldmUxMS1iZXRwbGF0aW5vLjI0MDY=" async=""></script>
+  <!-- END CHATBOX WOLKVOX-->
+</body>
+</html>
